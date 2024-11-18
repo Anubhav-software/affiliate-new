@@ -121,11 +121,12 @@ export const AffiliateLogin = () => {
             )}
           </form>
 
-          <div className="mt-5">
-            <Link to="/forgot-password" className="text-sm text-blue-600">
-              Forgot Password?
-            </Link>
-          </div>
+          <p className="text-center text-sm text-gray-600 mt-3">
+  Don't have an account?{" "}
+  <Link to="/register" className="text-blue-600 font-semibold hover:text-blue-800">
+    Register here
+  </Link>
+</p>
         </div>
       </section>
     </div>
