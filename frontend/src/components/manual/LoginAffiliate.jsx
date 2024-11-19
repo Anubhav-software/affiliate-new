@@ -1,4 +1,3 @@
-import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { ClockLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
@@ -23,21 +22,21 @@ export const AffiliateLogin = () => {
       setError("");
 
       try {
+       
         const response = await axios.post(
-          "http://localhost:5000/api/auth/login",
+          "http://localhost:5000/api/auth/login",  
           { email, password },
           { headers: { "Content-Type": "application/json" } }
         );
 
         if (response.status === 200) {
-          
-          localStorage.setItem("token", response.data.token);  
-          console.log("JWT Token stored:", response.data.token);  
-
           setLoading(false);
           setMessage("OTP sent to your email successfully!");
           setEmail("");
           setPassword("");
+
+         
+          localStorage.setItem("authToken", response.data.token);
 
           // Redirect to the OTP verification page
           navigate("/verify-otp");
@@ -48,8 +47,10 @@ export const AffiliateLogin = () => {
       } catch (err) {
         setLoading(false);
         setError("An error occurred. Please try again later.");
-        console.error("Login error:", err);  
+        console.error("Login error:", err);
       }
+    } else {
+      setError("Please enter a valid email and password.");
     }
   };
 
@@ -81,11 +82,7 @@ export const AffiliateLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-[90%] bg-transparent focus:outline-none"
                 />
-                {showPassword ? (
-                  <EyeOff onClick={() => setShowPassword(!showPassword)} />
-                ) : (
-                  <Eye onClick={() => setShowPassword(!showPassword)} />
-                )}
+               
               </div>
               {password.length > 0 && password.length < 8 && (
                 <span className="text-red-500">
@@ -122,11 +119,11 @@ export const AffiliateLogin = () => {
           </form>
 
           <p className="text-center text-sm text-gray-600 mt-3">
-  Don't have an account?{" "}
-  <Link to="/register" className="text-blue-600 font-semibold hover:text-blue-800">
-    Register here
-  </Link>
-</p>
+            Don't have an account?{" "}
+            <Link to="/register" className="text-blue-600 font-semibold hover:text-blue-800">
+              Register here
+            </Link>
+          </p>
         </div>
       </section>
     </div>

@@ -1,26 +1,21 @@
 import React, { useState } from "react";
 import { ClockLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const VerifyOTPPage = ({ setIsAuthenticated }) => {
-  const [otp, setOtp] = useState("");  // Store OTP input
-  const [loading, setLoading] = useState(false);  // For loading spinner
-  const [message, setMessage] = useState("");  // Success message
-  const [error, setError] = useState("");  // Error message
-  const navigate = useNavigate();  // Used for navigation after success
-
-  // Function to get the JWT token from localStorage
-  const getToken = () => {
-    const token = localStorage.getItem("token");
-    console.log("Retrieved token from localStorage:", token);
-    return token;
-  };
+  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!otp) {
-      setError("Please enter the OTP.");
+    if (!otp || !email) {
+      setError("Please enter both the email and OTP.");
       return;
     }
 
@@ -29,66 +24,44 @@ export const VerifyOTPPage = ({ setIsAuthenticated }) => {
     setError("");
 
     try {
-      const token = getToken();
-      console.log("Token retrieved in handleSubmit:", token);
+      const token = localStorage.getItem("authToken");
 
       if (!token) {
         setLoading(false);
-        setError("Authentication token missing. Please login again.");
-        console.log("No token found. Exiting...");
+        setError("Token not found. Please log in again.");
+        navigate("/login");  
         return;
       }
 
-      // Decode the JWT token
-      let decodedToken;
-      try {
-        decodedToken = JSON.parse(atob(token.split(".")[1]));  // Decoding the token
-        console.log("Decoded Token:", decodedToken);
-      } catch (e) {
-        console.error("Failed to decode token:", e);
-        setLoading(false);
-        setError("Invalid token format.");
-        return;
-      }
+      console.log("Token sent:", token); 
 
-      const email = decodedToken.email;
-      console.log("Email extracted from token:", email);
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/verify-otp",  
+        { otp, email },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`  
+          },
+          withCredentials: true 
+        }
+      );
 
-      // Send the request to verify OTP
-      const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,  
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ otp, email }),  
-        credentials: "include",  
-      });
-
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
-      
-      const data = await response.json();
-      console.log("Response data:", data);
-
-      if (response.ok) {
+      if (response.status === 200) {
         setLoading(false);
         setMessage("OTP verified successfully. Redirecting...");
-        console.log("OTP verified successfully!");
-
         setTimeout(() => {
-          setIsAuthenticated(true);  // Update auth state
-          navigate("/dashboard");  // Redirect to dashboard
+          setIsAuthenticated(true);
+          navigate("/dashboard");
         }, 2000);
       } else {
         setLoading(false);
-        setError(data.message || "Invalid OTP. Please try again.");
-        console.log("Error response from server:", data.message);
+        setError(response.data.message || "Invalid OTP. Please try again.");
       }
     } catch (err) {
       setLoading(false);
-      console.error("Error verifying OTP:", err);  // Log full error
       setError("An error occurred. Please try again later.");
+      console.error("Error verifying OTP:", err);
     }
   };
 
@@ -99,6 +72,17 @@ export const VerifyOTPPage = ({ setIsAuthenticated }) => {
           <h1 className="font-semibold text-2xl text-center mb-5">Verify OTP</h1>
 
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+            <label className="flex flex-col gap-2">
+              Email
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-transparent border-2 border-black/20 duration-200 focus:border-green-700 text-black p-2 focus:outline-none rounded-lg"
+              />
+            </label>
+
             <label className="flex flex-col gap-2">
               OTP
               <input

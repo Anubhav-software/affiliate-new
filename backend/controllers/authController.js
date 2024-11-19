@@ -56,8 +56,6 @@ const registerUser = async (req, res) => {
       .json({ message: "Password and confirm password do not match." });
   }
 
-  //already existing user
-
   const hashedPassword = await bcrypt.hash(password, 15);
 
   const user = new User({
@@ -99,97 +97,90 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
- 
   console.log("Login attempt received with email:", email);
   console.log("Password:", password);
 
- 
+  // Find user by email
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(400).json({ message: "User not found." });
   }
 
- 
+  // Check if the password is valid
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
     return res.status(400).json({ message: "Invalid password." });
   }
 
-  
+  // Generate OTP for the user
   const otp = crypto.randomInt(100000, 999999).toString();
-  user.otp = otp;  
+  user.otp = otp;
   await user.save();
 
- 
+  // Send OTP to user's email
   try {
-    await sendOTP(user.email, otp);  
+    await sendOTP(user.email, otp);
     console.log("OTP sent successfully to:", user.email);
   } catch (error) {
     console.error("Error sending OTP:", error);
-    return res.status(500).json({ message: "Error sending OTP. Please try again later." });
+    return res
+      .status(500)
+      .json({ message: "Error sending OTP. Please try again later." });
   }
 
-  
-  const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: "1d" });
-
-  // Step 5: Send the JWT token in the response
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: false,  
-    sameSite: "lax",
-    maxAge: 24 * 3600000,  
+  const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
   });
 
-  // Step 6: Respond with success message and token
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 24 * 3600000,
+  });
+
   res.status(200).json({
     message: "OTP sent to email. Please check your inbox.",
-    token: token, 
+    token,
   });
 };
 
-  const verifyOTP = async (req, res) => {
-    const { otp } = req.body; // Only get the OTP from the body
+const verifyOTP = async (req, res) => {
+  const { otp } = req.body;
+  const email = req.user.email;
 
-    console.log("Received request to verify OTP:", { email: req.user.email, otp });
+  console.log("Received request to verify OTP:", { email, otp });
 
-    // Find the user using the email from the JWT
-    const user = await User.findOne({ email: req.user.email });
+  const user = await User.findOne({ email });
 
-    console.log("User found in DB:", user);
+  if (!user) {
+    console.log("No user found with this email");
+    return res.status(400).json({ message: "User not found." });
+  }
 
-    if (!user) {
-      console.log("No user found with this email");
-      return res.status(400).json({ message: "User not found." });
-    }
+  console.log("Stored OTP in DB:", user.otp);
 
-    console.log("Stored OTP in DB:", user.otp);
+  if (user.otp !== otp) {
+    console.log("OTP mismatch: expected", user.otp, "but got", otp);
+    return res.status(400).json({ message: "Invalid OTP." });
+  }
 
-    if (user.otp !== otp) {
-      console.log("OTP mismatch: expected", user.otp, "but got", otp);
-      return res.status(400).json({ message: "Invalid OTP." });
-    }
+  user.otp = null;
+  await user.save();
 
-    // OTP is valid, clear it from the user's data
-    user.otp = null;
-    await user.save();
+  const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
 
-    const token = jwt.sign({ email: req.user.email }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    maxAge: 24 * 3600000, // 1 day
+  });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 24 * 3600000, 
-    });
+  console.log("OTP successfully verified, login successful.");
 
-    console.log("OTP successfully verified, login successful.");
-
-    res.status(200).json({ message: "Login successful", token });
-  };
-
+  res.status(200).json({ message: "Login successful", token });
+};
 
 module.exports = { registerUser, loginUser, verifyOTP };
-
-
