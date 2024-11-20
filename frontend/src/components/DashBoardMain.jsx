@@ -12,7 +12,7 @@ const DashBoardMain = () => {
 
   return (
     <div className="grid gap-4 p-4 grid-cols-[220px,_1fr]">
-      <Sidebar /> {/* Sidebar is always rendered */}
+      <Sidebar />
 
       <div className="bg-white rounded-lg pb-4 shadow">
         {/* Conditionally render components based on the route */}

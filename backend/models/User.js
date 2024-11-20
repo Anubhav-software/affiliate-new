@@ -72,7 +72,19 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     otp: { type: String },
+    upiId: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function (v) {
+          
+          return /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+$/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid UPI ID.`,
+      },
+    },
   },
+  
   {
     timestamps: true,
   }

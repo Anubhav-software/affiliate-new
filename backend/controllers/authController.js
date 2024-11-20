@@ -8,10 +8,13 @@ const sendOTP = async (email, otp) => {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE === "true",
+    secure: process.env.SMTP_SECURE === "false",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.EMAIL_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false, // SSL certificate validation hata raha hai
     },
   });
 
@@ -43,7 +46,8 @@ const registerUser = async (req, res) => {
     ifscCode,
     bankName,
     branchName,
-  } = req.body;
+    upiId,
+      } = req.body;
   const panImage = req.files.panFront[0].filename;
   const aadharImages = [
     req.files.aadharFront[0].filename,
@@ -71,6 +75,7 @@ const registerUser = async (req, res) => {
     ifscCode,
     bankName,
     branchName,
+    upiId,
   });
 
   try {
@@ -97,27 +102,30 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  console.log("Login attempt received with email:", email);
-  console.log("Password:", password);
+  console.log("Request Body:", req.body); 
 
-  // Find user by email
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and Password are required." });
+  }
+
+ 
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(400).json({ message: "User not found." });
   }
 
-  // Check if the password is valid
+  
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
     return res.status(400).json({ message: "Invalid password." });
   }
 
-  // Generate OTP for the user
+  
   const otp = crypto.randomInt(100000, 999999).toString();
   user.otp = otp;
   await user.save();
 
-  // Send OTP to user's email
+  
   try {
     await sendOTP(user.email, otp);
     console.log("OTP sent successfully to:", user.email);

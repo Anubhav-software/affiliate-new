@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/dbConfig.js");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes.js");
+const contactRoutes = require("./routes/contactRoutes.js");
 
 const app = express();
 
@@ -19,7 +20,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser()); 
 app.use(express.json());  
-app.use("/api/auth", authRoutes);  
+app.use("/api/auth", authRoutes); 
+app.use("/api", contactRoutes); 
 
 connectDB(); 
 // Start the server

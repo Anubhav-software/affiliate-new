@@ -14,6 +14,8 @@ const validateRegistrationData = (req, res, next) => {
     branchName,
     password,
     confirmPassword,
+    upiId,
+  
   } = req.body;
   const { panFront, aadharFront, aadharBack } = req.files || {};
 
@@ -28,7 +30,9 @@ const validateRegistrationData = (req, res, next) => {
     !bankName ||
     !branchName ||
     !password ||
-    !confirmPassword
+    !confirmPassword ||
+    !upiId 
+  
   ) {
     console.log("Validation failed: Missing required fields.");
     return res
@@ -104,6 +108,16 @@ const validateRegistrationData = (req, res, next) => {
   } else {
     console.log("Valid IFSC code format.");
   }
+
+  const upiRegex = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+$/;
+  if (!upiRegex.test(upiId)) {
+    console.log("Validation failed: Invalid UPI ID.");
+    return res.status(400).json({ message: "Invalid UPI ID format." });
+  } else {
+    console.log("Valid UPI ID.");
+  }
+    
+ 
 
   // If all validations pass, proceed to next middleware
   console.log("All validations passed. Proceeding to next middleware.");

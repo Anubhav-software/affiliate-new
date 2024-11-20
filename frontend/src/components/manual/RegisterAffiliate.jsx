@@ -41,6 +41,7 @@ export const RegisterAffiliate = ({ setIsAuthenticated }) => {
     formData.append("branchName", e.target.branchName.value);
     formData.append("password", e.target.password.value);
     formData.append("confirmPassword", e.target.confirmPassword.value);
+    formData.append("upiId", e.target.UpiId.value);
 
    
     if (aadharImages[0]) {
@@ -256,6 +257,20 @@ export const RegisterAffiliate = ({ setIsAuthenticated }) => {
                     className="bg-transparent border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-100 duration-200 ease-in-out shadow-sm hover:shadow-md"
                   />
                 </label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <label className="flex flex-col gap-2">
+                  <span className="text-gray-700 font-semibold">UPI ID</span>
+                  <input
+                    type="string"
+                    name="UpiId"
+                    placeholder="UPI-ID"
+                    className="bg-transparent border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-100 duration-200 ease-in-out shadow-sm hover:shadow-md"
+                  />
+                  
+                </label>
+                
               </div>
 
               <button
