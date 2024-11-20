@@ -7,8 +7,9 @@ import { useState } from "react";
 import DashBoardMain from "./components/DashBoardMain";
 import Customer from "./components/manual/Customer";
 import Payment from "./components/manual/Payment";
-import Calender from "./components/manual/Calender";
+import Calender from "./components/manual/Leads";
 import { Dashboard } from "./components/manual/Dashboard/DashBoard";
+import Leads from "./components/manual/Leads";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,10 +38,10 @@ function App() {
           <>
             <>
               <Route path="/dashboard" element={<DashBoardMain />}>
-                <Route path="" element={<Dashboard />} />
+                
                 <Route path="customer" element={<Customer />} />
                 <Route path="payment" element={<Payment />} />
-                <Route path="calendar" element={<Calender />} />
+                <Route path="leads" element={<Leads />} />
               </Route>
             </>
           </>
@@ -51,4 +52,3 @@ function App() {
 }
 
 export default App;
-

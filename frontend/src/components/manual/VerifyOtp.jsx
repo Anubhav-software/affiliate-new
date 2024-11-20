@@ -29,27 +29,33 @@ export const VerifyOTPPage = ({ setIsAuthenticated }) => {
       if (!token) {
         setLoading(false);
         setError("Token not found. Please log in again.");
-        navigate("/login");  
+        navigate("/login");
         return;
       }
 
-      console.log("Token sent:", token); 
+      console.log("Token sent:", token);
 
       const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",  
+        "http://localhost:5000/api/auth/verify-otp",
         { otp, email },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`  
+            Authorization: `Bearer ${token}`,
           },
-          withCredentials: true 
+          withCredentials: true,
         }
       );
 
       if (response.status === 200) {
         setLoading(false);
         setMessage("OTP verified successfully. Redirecting...");
+
+        const { token: newToken } = response.data;
+
+        if (newToken) {
+          localStorage.setItem("authToken", newToken);
+        }
         setTimeout(() => {
           setIsAuthenticated(true);
           navigate("/dashboard");
@@ -69,7 +75,9 @@ export const VerifyOTPPage = ({ setIsAuthenticated }) => {
     <div className="max-w-[450px] mx-auto">
       <section className="flex min-h-[88vh] justify-center items-center">
         <div className="border-black/10 border-2 shadow-lg shadow-black/10 w-full m-4 md:m-auto p-4 rounded-lg">
-          <h1 className="font-semibold text-2xl text-center mb-5">Verify OTP</h1>
+          <h1 className="font-semibold text-2xl text-center mb-5">
+            Verify OTP
+          </h1>
 
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
             <label className="flex flex-col gap-2">
@@ -105,8 +113,12 @@ export const VerifyOTPPage = ({ setIsAuthenticated }) => {
             ) : (
               <button
                 type="submit"
-                className={`p-3 ${otp.length === 6 ? "bg-green-600 text-white cursor-pointer" : "bg-black/30 text-white cursor-not-allowed"} rounded-lg mt-3 font-semibold duration-200`}
-                disabled={!(otp.length === 6)}  // Assuming OTP is 6 digits
+                className={`p-3 ${
+                  otp.length === 6
+                    ? "bg-green-600 text-white cursor-pointer"
+                    : "bg-black/30 text-white cursor-not-allowed"
+                } rounded-lg mt-3 font-semibold duration-200`}
+                disabled={!(otp.length === 6)} // Assuming OTP is 6 digits
               >
                 Verify OTP
               </button>

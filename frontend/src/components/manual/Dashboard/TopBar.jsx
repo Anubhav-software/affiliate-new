@@ -6,7 +6,7 @@ export const TopBar = () => {
     <div className="border-b px-4 mb-4 mt-2 pb-4 border-stone-200">
       <div className="flex items-center justify-between p-0.5">
         <div>
-          <span className="text-lg font-bold block">🚀 Good morning, User!</span>
+          <span className="text-lg font-bold block">🚀 Welcome Affiliate, User!</span>
           <span className="text-sm block text-stone-500">
             Tuesday, Aug 8th 2023
           </span>

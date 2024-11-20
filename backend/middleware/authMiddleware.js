@@ -10,6 +10,7 @@ const verifyToken = (req, res, next) => {
     console.log("No token provided.");
     return res.status(401).json({ message: "Access Denied. No token provided." });
   }
+  console.log("Token found:", token);
 
   try {
     console.log("Token found, verifying...");

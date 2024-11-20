@@ -13,7 +13,7 @@ export const RouteSelect = () => {
     <div className="space-y-1">
       <Route Icon={FiHome} selected={true} title="Dashboard" to="/dashboard" />
       <Route Icon={FiUsers} selected={false} title="Customer" to="/dashboard/customer" />
-      <Route Icon={FiPaperclip} selected={false} title="Calendar" to="/dashboard/calendar" />
+      <Route Icon={FiPaperclip} selected={false} title="Leads" to="/dashboard/leads" />
       <Route Icon={FiLink} selected={false} title="Logout" />
       <Route Icon={FiDollarSign} selected={false} title="Payment" to="/dashboard/payment"/>
     </div>

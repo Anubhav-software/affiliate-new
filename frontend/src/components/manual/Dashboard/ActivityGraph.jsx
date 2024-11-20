@@ -6,13 +6,18 @@ export const ActivityGraph = () => {
 
   const handleCopyClick = () => {
     const url = document.getElementById("website-url");
+    // Select the input text to copy
     url.select();
     document.execCommand("copy");
     setCopied(true);
 
+    // Reset the "Copied!" state after 2 seconds
     setTimeout(() => {
       setCopied(false);
     }, 2000);
+
+    // Prevent the input border from being highlighted when it's focused
+    url.blur();
   };
 
   const handleShareClick = () => {
@@ -30,7 +35,7 @@ export const ActivityGraph = () => {
   };
 
   return (
-    <div className="col-span-8  overflow-hidden rounded border border-stone-300 h-60">
+    <div className="col-span-8 overflow-hidden rounded border border-stone-300 h-60">
       <div className="p-4">
         <h3 className="flex items-center gap-1.5 font-semibold text-xl">
           <FiUser /> Copy Url:
@@ -58,10 +63,10 @@ export const ActivityGraph = () => {
               id="website-url"
               type="text"
               aria-describedby="helper-text-explanation"
-              className="bg-gray-50 border border-e-0 border-gray-300 text-gray-500 dark:text-gray-400 text-base border-s-0 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value="https://flowbite.com"
-              readOnly
-              disabled
+              className="bg-gray-50 border border-e-0 border-gray-300 text-gray-500 dark:text-gray-400 text-base border-s-0 focus:ring-0 focus:border-gray-300 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-200 dark:placeholder-gray-400 dark:focus:ring-0 dark:focus:border-gray-200"
+              value="https://anayasoftwares.in"
+              
+              
             />
           </div>
 
@@ -81,6 +86,7 @@ export const ActivityGraph = () => {
             <FiShare2 className="w-4 h-4" />
           </button>
 
+          {/* Tooltip */}
           <div
             id="tooltip-website-url"
             role="tooltip"

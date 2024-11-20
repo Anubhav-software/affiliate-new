@@ -42,7 +42,7 @@ const handleContactForm = async (req, res) => {
     });
 
     await newContact.save();
-    res.status(201).json({ message: "Contact form submitted successfully." });
+    res.status(200).json({ message: "Contact form submitted successfully." });
   } catch (error) {
     console.error("Error saving contact form: ", error);
     res.status(500).json({ message: "Error submitting contact form. Please try again later." });
